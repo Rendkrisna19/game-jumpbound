@@ -24,7 +24,7 @@ function buildMaterials(c) {
     boot: soft(c.boot, 0.7),
     cap: soft(c.hat, 0.6),
     capDark: soft(c.hatDark, 0.6),
-    glass: getMaterial(c.hat, { flat: false, roughness: 0.1, transparent: true, opacity: 0.3, depthWrite: false }),
+    glass: getMaterial(c.hat, { flat: false, roughness: 0.1, transparent: true, opacity: 0.18, depthWrite: false }),
     plume: getMaterial(c.accent, { flat: true, roughness: 0.6 }),
     star: getMaterial(c.accent, { flat: true, roughness: 0.4, emissive: c.accent, emissiveIntensity: 0.8 }),
     scarf: soft(c.scarf, 0.8),
