@@ -9,6 +9,7 @@ import { playerApi, playerState } from './game/playerState';
 import { gameClock } from './game/clock';
 import { audio } from './audio/AudioManager';
 import { enemyDebug } from './scene/entities/Enemies';
+import { moverDebug } from './scene/environment/Platforms';
 
 function detectWebGL() {
   try {
@@ -111,7 +112,7 @@ function useKeyboard() {
 function useDebugHook() {
   useEffect(() => {
     if (!import.meta.env.DEV && !window.location.search.includes('debug')) return undefined;
-    window.__jumpbound = { getGame, playerState, playerApi, gameClock, LEVELS, enemies: () => Object.fromEntries(enemyDebug) };
+    window.__jumpbound = { getGame, playerState, playerApi, gameClock, LEVELS, enemies: () => Object.fromEntries(enemyDebug), movers: () => Object.fromEntries(moverDebug) };
     return () => {
       delete window.__jumpbound;
     };

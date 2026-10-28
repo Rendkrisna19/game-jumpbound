@@ -9,6 +9,9 @@ import { hashString } from '../../game/math/random';
 import { getMaterial } from '../materials';
 import { islandGeometry, boxGeometry, cylinderGeometry, coneGeometry } from '../geometry';
 
+/** Live top-centre positions of moving platforms, read by the debug hook for automated tests. */
+export const moverDebug = new Map();
+
 /** Registers a collider in the surface registry once Rapier has created it. */
 function useSurface(colliderRef, info) {
   const entry = useRef(null);
@@ -207,6 +210,7 @@ function MovingPlatform({ p, theme }) {
     const nx = tmp[0];
     const ny = tmp[1] - h / 2;
     const nz = tmp[2];
+    moverDebug.set(p.id, [tmp[0], tmp[1], tmp[2]]);
     const cur = body.translation();
     if (entry.current) entry.current.delta.set(nx - cur.x, ny - cur.y, nz - cur.z);
     body.setNextKinematicTranslation({ x: nx, y: ny, z: nz });

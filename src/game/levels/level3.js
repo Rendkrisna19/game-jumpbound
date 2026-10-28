@@ -13,7 +13,6 @@ export default {
   cameraYaw: 0,
   killY: -14,
   spawn: [0, 0, 2.5],
-  final: true,
   theme: {
     key: 'temple',
     music: 'temple',

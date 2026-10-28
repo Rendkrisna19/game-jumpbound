@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { AdditiveBlending, CanvasTexture, DoubleSide, MeshBasicMaterial, SRGBColorSpace } from 'three';
 import { getMaterial } from '../materials';
-import { playerState, playerApi } from '../../game/playerState';
+import { playerState, playerApi, addCameraTrauma } from '../../game/playerState';
 import { capsuleSphere } from '../../game/math/collision';
 import { gameClock } from '../../game/clock';
 import { isPlaying } from '../../game/store';
@@ -73,9 +73,17 @@ export default function Portal({ level }) {
   const ringMat = getMaterial(final ? '#ffd25a' : '#9b6bff', { roughness: 0.3, metalness: 0.5, emissive: final ? '#ff9d00' : '#5a2fd0', emissiveIntensity: 0.7 });
   const stone = getMaterial(level.theme.palette.topDark);
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     const t = gameClock.time;
     if (disc.current) disc.current.rotation.z = -t * 1.6;
+    // The gate rumbles as the hero closes in: the closer, the stronger the shake.
+    if (isPlaying() && !triggered.current && !playerState.dead) {
+      const d = Math.hypot(playerState.position.x - center[0], playerState.position.z - center[2]);
+      if (d < 14) addCameraTrauma(((14 - d) / 14) * 0.9 * Math.min(delta, 0.05) * 3);
+    }
+    if (ringRef.current && !triggered.current) {
+      ringRef.current.position.x = Math.sin(t * 38) * 0.02 * Math.max(0, 1 - Math.abs(playerState.position.y - center[1]) / 6);
+    }
     if (ringRef.current) {
       const pulse = triggered.current ? 1 + Math.sin(t * 12) * 0.06 + 0.12 : 1 + Math.sin(t * 2) * 0.03;
       ringRef.current.scale.setScalar(pulse);

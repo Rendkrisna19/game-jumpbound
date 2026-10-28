@@ -5,6 +5,17 @@ import { createRng } from '../game/math/random.js';
 
 const midiToFreq = (m) => 440 * Math.pow(2, (m - 69) / 12);
 
+// Licensed music loops in public/assets/music (all CC0 — see ASSET_CREDITS.md).
+// The menu gets its own track; every island gets a different one.
+const FILE_TRACKS = {
+  menu: 'menu-a-brand-new-wisdom.ogg',
+  meadow: 'meadow-shakkar.ogg',
+  canyon: 'canyon-telos-wilderness-14.ogg',
+  temple: 'temple-a-path-somewhere.ogg',
+  lagoon: 'lagoon-swinging-sweet.ogg',
+  candy: 'summit-just-saying-tho.ogg',
+};
+
 // ---------- music definitions (original compositions generated from fixed seeds) ----------
 const SCALES = {
   majorPent: [0, 2, 4, 7, 9],
@@ -18,6 +29,8 @@ const TRACKS = {
   meadow: { bpm: 116, root: 60, scale: 'major', chords: [[0, 4, 7], [5, 9, 12], [-3, 0, 4], [7, 11, 14]], seed: 3, drums: true, lead: 'square' },
   canyon: { bpm: 104, root: 57, scale: 'dorian', chords: [[0, 3, 7], [-2, 2, 5], [-4, 0, 3], [-2, 2, 5]], seed: 7, drums: true, lead: 'triangle' },
   temple: { bpm: 90, root: 64, scale: 'lydian', chords: [[0, 4, 7], [2, 6, 9], [-1, 2, 7], [-3, 0, 4]], seed: 19, drums: true, lead: 'sine' },
+  lagoon: { bpm: 122, root: 62, scale: 'majorPent', chords: [[0, 4, 7], [5, 9, 12], [7, 11, 14], [-5, -1, 2]], seed: 23, drums: true, lead: 'triangle' },
+  candy: { bpm: 128, root: 65, scale: 'lydian', chords: [[0, 4, 7], [-3, 0, 4], [2, 6, 9], [-5, -1, 2]], seed: 31, drums: true, lead: 'square' },
 };
 
 function buildMelody(track) {
@@ -50,6 +63,10 @@ class AudioManager {
     this.pendingTrack = null;
     this.timer = null;
     this.ducked = false;
+    this.buffers = new Map();
+    this.fileSource = null;
+    this.currentMusic = null;
+    this.musicToken = 0;
     this.lastCollect = 0;
     this.combo = 0;
   }
@@ -252,21 +269,82 @@ class AudioManager {
   }
 
   // ---------- music ----------
+  /** Plays the licensed loop for `name` (see FILE_TRACKS), or the procedural fallback if it fails. */
   playMusic(name) {
     this.pendingTrack = name;
     if (!this.ctx) return;
-    if (this.track?.name === name && this.timer) return;
+    if (this.currentMusic === name) return;
     this.stopMusic(true);
+    this.currentMusic = name;
+    const token = ++this.musicToken;
+    if (FILE_TRACKS[name]) {
+      this.playFileTrack(name, token);
+    } else {
+      this.playProcedural(name);
+    }
+  }
+
+  playProcedural(name) {
     const def = TRACKS[name];
     if (!def) return;
     this.track = { name, def, melody: buildMelody(def), step: 0, nextTime: this.ctx.currentTime + 0.1 };
     this.timer = window.setInterval(() => this.schedule(), 25);
   }
 
+  async playFileTrack(name, token) {
+    const buffer = await this.loadBuffer(name);
+    if (token !== this.musicToken) return;
+    if (!buffer) {
+      this.playProcedural(name);
+      return;
+    }
+    const ctx = this.ctx;
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
+    src.loop = true;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(1, ctx.currentTime + 1.5);
+    src.connect(gain).connect(this.musicBus);
+    src.start();
+    this.fileSource = { src, gain };
+  }
+
+  async loadBuffer(name) {
+    if (!this.buffers.has(name)) {
+      const url = `${import.meta.env.BASE_URL}assets/music/${FILE_TRACKS[name]}`;
+      this.buffers.set(
+        name,
+        fetch(url)
+          .then((r) => {
+            if (!r.ok) throw new Error(`${r.status} ${url}`);
+            return r.arrayBuffer();
+          })
+          .then((data) => this.ctx.decodeAudioData(data))
+          .catch((err) => {
+            console.warn('Music file unavailable, using procedural fallback:', err.message);
+            return null;
+          }),
+      );
+    }
+    return this.buffers.get(name);
+  }
+
   stopMusic(immediate = false) {
     if (this.timer) window.clearInterval(this.timer);
     this.timer = null;
     this.track = null;
+    if (this.fileSource && this.ctx) {
+      const { src, gain } = this.fileSource;
+      const t = this.ctx.currentTime;
+      gain.gain.cancelScheduledValues(t);
+      gain.gain.setValueAtTime(gain.gain.value, t);
+      gain.gain.linearRampToValueAtTime(0, t + 0.4);
+      src.stop(t + 0.45);
+    }
+    this.fileSource = null;
+    this.currentMusic = null;
+    this.musicToken++;
     if (!immediate) this.pendingTrack = null;
   }
 

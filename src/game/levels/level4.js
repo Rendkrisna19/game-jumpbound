@@ -1,0 +1,102 @@
+import { line, arc, ring, at } from './helpers.js';
+
+// LEVEL 4 — CORAL LAGOON
+// A bright turquoise lagoon of sandy islands. Longer than the earlier stages: timed tiles,
+// a bounce mushroom to reach a high ledge, a sprint-only leap, a moving platform and a
+// guardian guarding the final island.
+
+export default {
+  id: 'coral-lagoon',
+  name: 'Coral Lagoon',
+  subtitle: 'Island IV',
+  objective: 'Cross the lagoon to the Glimmer Portal',
+  parTime: 230,
+  cameraYaw: 0,
+  killY: -16,
+  spawn: [0, 0, 2.5],
+  theme: {
+    key: 'lagoon',
+    music: 'lagoon',
+    sky: { top: '#4fd8ff', horizon: '#c9f5ff', bottom: '#eafcff', sun: '#fff6c9' },
+    fog: { color: '#bdefff', near: 60, far: 230 },
+    light: {
+      sun: '#fff6dd', sunIntensity: 2.7, sunDir: [0.5, 1, 0.3],
+      hemiSky: '#e4fbff', hemiGround: '#7fd6b0', hemiIntensity: 1.05,
+    },
+    floor: { type: 'sea', color: '#2ed6c9', deep: '#1aa6b0', y: -28 },
+    palette: {
+      top: '#8be36b', topDark: '#5fc34e', side: '#f4c58a', rock: '#e9a878',
+      wood: '#f0b070', woodDark: '#c97d45', trim: '#ff7aa8', accent: '#ffd84a',
+    },
+  },
+  platforms: [
+    { id: 'start', type: 'island', pos: [0, 0, 0], radius: 6, decor: { flower: 14, tree: 2, grass: 12 } },
+    { id: 'a', type: 'island', pos: [0, 0, -12], radius: 4.5, decor: { flower: 6, grass: 6 } },
+    { id: 'b', type: 'island', pos: [0, 0.6, -22], radius: 3.5, decor: { mushroom: 2, flower: 4 } },
+    { id: 't1', type: 'timed', pos: [0, 1.2, -30], size: [2.8, 0.5, 2.8], period: 4.5, on: 3.0, phase: 0 },
+    { id: 'c', type: 'island', pos: [0, 1.8, -38], radius: 4.5, decor: { tree: 2, flower: 8, grass: 8 } },
+    { id: 'cap', type: 'mushroom', pos: [-4.6, 2.2, -41], radius: 1.2, bounce: 17 },
+    { id: 'ledge', type: 'island', pos: [-9, 5.2, -45], radius: 2.2, decor: { flower: 4 } },
+    { id: 'd', type: 'island', pos: [0, 2.6, -54], radius: 5, decor: { tree: 2, flower: 10, grass: 10, rock: 1 } },
+    { id: 'mover1', type: 'mover', pos: [0, 2.6, -63.5], size: [2.6, 0.5, 2.6], offset: [0, 0, -5], period: 5 },
+    { id: 'e', type: 'island', pos: [0, 2.6, -75], radius: 4.5, decor: { tree: 1, flower: 8, grass: 8 } },
+    { id: 't2', type: 'timed', pos: [0, 3.2, -83], size: [2.6, 0.5, 2.6], period: 4.5, on: 3.0, phase: 0.75 },
+    { id: 'f', type: 'island', pos: [0, 3.8, -91], radius: 5, decor: { tree: 2, flower: 12, grass: 10, mushroom: 3 } },
+    { id: 'side', type: 'pillar', pos: [6.5, 4.6, -92], radius: 1.1, depth: 7 },
+    { id: 'g', type: 'block', pos: [0, 3.8, -101], size: [3.2, 2.2, 3.2], decor: { shrub: 2 } },
+    { id: 'mover2', type: 'mover', pos: [0, 3.8, -109], size: [2.8, 0.5, 2.8], offset: [7, 0, 0], period: 5.5 },
+    { id: 'h', type: 'island', pos: [0, 4.6, -118], radius: 5.5, decor: { tree: 3, flower: 14, grass: 10 } },
+    { id: 'goal', type: 'island', pos: [0, 4.6, -132], radius: 6, decor: { tree: 3, flower: 16, grass: 12, rock: 2 } },
+  ],
+  routes: [
+    ['start', 'a', 'b', 't1', 'c', 'cap', 'ledge', { id: 'd', sprint: true }, 'mover1', 'e', 't2', 'f', 'g', { id: 'mover2', sprint: true }, 'h', 'goal'],
+    ['f', 'side', 'f'],
+    ['c', 'cap', 'c'],
+  ],
+  checkpoints: [
+    { pos: [0, 2.6, -50] },
+    { pos: [0, 3.8, -88] },
+  ],
+  portal: { pos: [0, 4.6, -134] },
+  enemies: [
+    { type: 'wanderer', from: [-2, 3.8, -94], to: [2, 3.8, -94], speed: 2 },
+    { type: 'guardian', home: [0, 6.0, -118], radius: 3.4 },
+    { type: 'wanderer', from: [-2.5, 4.6, -114], to: [2.5, 4.6, -114], speed: 2.4 },
+  ],
+  hazards: [
+    { type: 'spikes', pos: [2.2, 2.6, -50], size: [1.5, 1.5] },
+    { type: 'pulseSpikes', pos: [-2.2, 2.6, -75], size: [1.6, 1.6], period: 3, phase: 0 },
+  ],
+  hints: [
+    { pos: [0, 1.2, -27], radius: 2.5, text: 'Timed tiles glow before they fade - jump while they are solid' },
+    { pos: [-9, 5.2, -45], radius: 3, text: 'Bounce off the mushroom cap to reach high ledges' },
+    { pos: [0, 2.6, -54], radius: 2.5, text: 'Hold SHIFT for the long leap to the next island' },
+  ],
+  crystals: [
+    ...line([0, 0, -2], [0, 0, -9], 4),
+    ...ring([0, 0, -12], 2.4, 6),
+    ...arc([0, 0, -14], [0, 0.6, -20], 2, 1.2),
+    ...ring([0, 0.6, -22], 2, 5),
+    ...line([0, 1.2, -27], [0, 1.2, -33], 3),
+    ...ring([0, 1.8, -38], 2.6, 6),
+    ...arc([-2, 1.8, -41], [-6, 2.2, -41], 1, 1.6),
+    at([-9, 5.2, -45]),
+    ...arc([-5, 4.5, -44], [-2, 2.6, -50], 2, 1.5),
+    ...ring([0, 2.6, -54], 2.8, 6),
+    ...line([0, 2.6, -62], [0, 2.6, -66], 2),
+    ...line([0, 2.6, -71], [0, 2.6, -75], 2),
+    ...ring([0, 2.6, -75], 2.5, 5),
+    at([0, 3.2, -83]),
+    ...ring([0, 3.8, -91], 3, 6),
+    at([6.5, 4.6, -92]),
+    ...line([0, 3.8, -97], [0, 3.8, -100], 2),
+    ...line([0, 3.8, -104], [0, 3.8, -108], 2),
+    ...ring([0, 4.6, -118], 2.8, 6),
+    ...line([0, 4.6, -124], [0, 4.6, -129], 3),
+  ],
+  sunstones: [
+    at([-9, 5.2, -45], 0.4),
+    at([6.5, 4.6, -92], 0.3),
+    at([0, 4.6, -120], 0.9),
+  ],
+};

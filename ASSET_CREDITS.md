@@ -9,7 +9,15 @@ hears is **generated at runtime by code in this repository**, and nothing is loa
 |---|---|---|---|---|---|
 | **Fredoka** typeface (weights 400/600/700) | All UI text | npm package [`@fontsource/fredoka`](https://fontsource.org/fonts/fredoka) (upstream: https://github.com/hafontia/Fredoka-One) | The Fredoka Project Authors | [SIL Open Font License 1.1](https://openfontlicense.org/) | No attribution is needed in the UI. The license text must stay with redistributed font files (it ships in `node_modules/@fontsource/fredoka/LICENSE`). The font must not be sold on its own. |
 
+| **Menu theme** — "A Brand New Wisdom" (`public/assets/music/menu-a-brand-new-wisdom.ogg`) | Main menu music | https://opengameart.org/sites/default/files/A%20Brand%20New%20Wisdom.ogg (page: https://opengameart.org/content/short-loops-background-music-pack) | hernandack | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | No (credit appreciated) |
+| **Meadow theme** — "Shakkar" (`public/assets/music/meadow-shakkar.ogg`) | Island I music | https://opengameart.org/content/shakkar | zesona (credit to Chris Murphy optional) | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | No (credit optional) |
+| **Canyon theme** — "Telos Wilderness 14" (`public/assets/music/canyon-telos-wilderness-14.ogg`) | Island II music | https://opengameart.org/content/telos-wilderness-14 | Tozan | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | No (attribution optional) |
+| **Temple theme** — "A Path Which Leads to Somewhere" (`public/assets/music/temple-a-path-somewhere.ogg`) | Island III music | https://opengameart.org/content/a-path-which-leads-to-somewhere | Centurion_of_war | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | No (credit appreciated) |
+| **Lagoon theme** — "Swinging Sweet" (`public/assets/music/lagoon-swinging-sweet.ogg`) | Island IV music | https://opengameart.org/content/short-loops-background-music-pack | hernandack | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | No (credit appreciated) |
+| **Summit theme** — "Just Saying Tho" (`public/assets/music/summit-just-saying-tho.ogg`) | Island V music | https://opengameart.org/content/short-loops-background-music-pack | hernandack | [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/) | No (credit appreciated) |
+
 The font files are bundled into `dist/assets/` at build time. They are never fetched from a CDN.
+The music files are copied into `public/assets/music/` and served from the game's own domain.
 
 ## Original assets (created for this project)
 

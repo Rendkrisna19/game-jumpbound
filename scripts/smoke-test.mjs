@@ -237,7 +237,7 @@ try {
   check('final portal completes the game', await waitFor(async () => (await state()).screen === 'victory', 30000));
   await sleep(800);
   await shot('11-final-victory');
-  check('final result flagged', await game('j.getGame().result.final === true'));
+  check('Sky Temple is not the final stage anymore', await game('j.getGame().result.final === false'));
 
   // ---- Crystal Guardian charges at an intruder ----
   await game('j.getGame().startLevel(1)');
@@ -298,7 +298,7 @@ try {
   await levelsBtn.click();
   await sleep(500);
   await shot('14-level-select');
-  check('all three levels unlocked after completion', await page.evaluate(() => document.querySelectorAll('.level-card:not([disabled])').length === 3));
+  check('levels 1-4 unlocked after completing level 3', await page.evaluate(() => document.querySelectorAll('.level-card:not([disabled])').length === 4));
 
   const relevant = errors.filter((e) => !/GPU stall|WebGL.*performance|swiftshader|ReadPixels|Automatic fallback to software/i.test(e));
   check('no console errors or warnings', relevant.length === 0, relevant.slice(0, 8).join(' | '));

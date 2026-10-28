@@ -66,6 +66,7 @@ export default function Player({ level }) {
       hintTimer: 0,
       lastFrameAt: 0,
       ray: null,
+      platform: null,
     }),
     [spawnCenter],
   );
@@ -112,6 +113,7 @@ export default function Player({ level }) {
       st.grounded = false;
       st.jumping = false;
       st.airTime = 0;
+      st.platform = null;
       st.controlLock = 0;
       st.jumpBuffer = 0;
       body.current?.setTranslation(st.pos, true);
@@ -290,6 +292,9 @@ export default function Player({ level }) {
 
     // --- collide & slide through the Rapier character controller ---
     st.desired.set(st.vel.x * dt, st.vel.y * dt, st.vel.z * dt);
+    // Ride the platform we stood on last frame. The platform's motion goes through the controller,
+    // so it can't push the hero into walls or leave them hovering.
+    if (st.platform) st.desired.add(st.platform.delta);
     ctrl.computeColliderMovement(col, st.desired, rapier.QueryFilterFlags.EXCLUDE_SENSORS);
     const m = ctrl.computedMovement();
     let groundedNow = ctrl.computedGrounded() && st.vel.y <= 0;
@@ -345,7 +350,7 @@ export default function Player({ level }) {
       st.grounded = false;
     }
 
-    if (surface && st.grounded) st.pos.add(surface.delta);
+    st.platform = st.grounded ? surface : null;
 
     rb.setNextKinematicTranslation(st.pos);
 
